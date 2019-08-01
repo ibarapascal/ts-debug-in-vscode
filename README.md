@@ -1,4 +1,29 @@
-# Debugging TypeScript in VS Code Without Compiling (using `ts-node`)
+# Debugging TypeScript in VS Code
+
+A typescript playgound repo having normal packages setted for some small quick use in different branch.
+
+Scenes:
+
+1.Play with typescript, node using vscode.
+
+2.Checkout a new package usability.
+
+3.Try to dev some tools using some certain packages.
+
+## Branch
+
+- master: origin with updated package
+
+- pkg/data-process
+
+- pkg/http-client
+
+- pkg/chart
+
+
+# Original README
+
+## Debugging TypeScript in VS Code Without Compiling (using `ts-node`)
 
 This repo contains a sample TypeScript project with a Visual Studio Code `launch.json` that
 allows you run TypeScript code and Mocha tests without a separate build step.
