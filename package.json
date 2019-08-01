@@ -15,5 +15,9 @@
     "mocha": "^6.2.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/node": "^12.6.8",
+    "convert-csv-to-json": "0.0.15"
   }
 }
