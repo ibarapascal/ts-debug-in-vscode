@@ -7,7 +7,7 @@ package.json
 
 import fs from 'fs';
 
-let outputPath = "src/data_source/test-output.json"
+let outputPath = "src/_test_data_source/test-output.json"
 let outputData = {
     "data":[{
         "id":1,

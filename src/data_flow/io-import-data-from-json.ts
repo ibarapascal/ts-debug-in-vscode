@@ -10,7 +10,7 @@ tsconfig.json
         "esModuleInterop": true
 */
 
-import data from './data_source/import-data-from-json-test.json';
+import data from '../_test_data_source/import-data-from-json-test.json';
 
 interface testDataObject {
     id: number;
