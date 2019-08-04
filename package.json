@@ -17,7 +17,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.6.9",
     "convert-csv-to-json": "0.0.15"
   }
 }
