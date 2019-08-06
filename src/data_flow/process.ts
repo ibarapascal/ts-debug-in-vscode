@@ -1,24 +1,68 @@
 import FormatTradeDataService from '../data_flow/format-trade-data-service';
 import DataObject from '../data_flow/data-object';
+import fs from 'fs';
 
-import data from '../_test_data_source/db-btc-hours-20130401-20190307.json';
-// import data from '../_test_data_source/db-btc-hours-20140202-20190307.json';
-let impData: DataObject[] = data.data; // Good to run
-// let impData: DataObject[] = data.data.slice(-50000); => also same range of data
-// start from middle => last the same
-// Seems max length get from before: 54001 records.
+function readData(path: string): DataObject[] {
+    const impData: DataObject[] = JSON.parse(fs.readFileSync(path, 'utf8')).data;
+    return impData;
+}
 
-const startTimestamp = FormatTradeDataService.getAttrMin(impData, 'time').time;
-const endTimestamp = FormatTradeDataService.getAttrMax(impData, 'time').time;
-const totalNumber = impData.length;
+function getFormatData(impData: DataObject[]): DataObject[] {
+    const r1: DataObject[] = FormatTradeDataService.makeOneEmptyAllEmpty(impData);
+    const r2: DataObject[] = FormatTradeDataService.makeItemUnique(r1, 'time');
+    const outData: DataObject[] = FormatTradeDataService.makeEmptyItemDelete(r2);
+    return outData;
+}
+
+function getUsefulData(outData: DataObject[]): DataObject[] {
+    const pieceData: DataObject[][] = FormatTradeDataService.makeIdxconsequentList(outData, 'time', 3600);
+    const usefulData: DataObject[] = FormatTradeDataService.getMaxLengthList(pieceData);
+    return usefulData;
+}
+
+function saveDataToJSON(path: string, saveData: DataObject[]) {
+    const outputData = {data: saveData, }    
+    fs.writeFileSync(path, JSON.stringify(outputData));
+}
+
+function saveDataToCsv(path: string, saveData: DataObject[]) {
+    const header = Object.keys(saveData[0]);
+    let csv = saveData.map(row => header.map(fieldName => JSON.stringify(row[fieldName])).join(','));
+    csv.unshift(header.join(','));
+    const resultData = csv.join('\r\n');
+    fs.writeFileSync(path, resultData);
+}
+
+function saveDataToCsvChart(path: string, saveData: DataObject[]) {
+    const header = Object.keys(saveData[0]);
+    let csv = saveData.map(row => header.filter(item => item === 'close').map(fieldName => JSON.stringify(row[fieldName])).join(','));
+    csv.unshift(header.filter(item => item === 'close').join(','));
+    console.log(csv[0]);
+    console.log(csv[1]);
+    console.log(csv[2]);
+    const resultData = csv.join('\r\n');
+    fs.writeFileSync(path, resultData);
+}
+
+const rootPath = 'src/_test_data_source/'; // './src/_test_data_source/' the same
+const inputJsonName = 'db-btc-hours-20130401-20190307.json';
+const outputJsonName = 'test-output.json';
+const outputCsvName = 'test-output.csv';
+const outputCsvChartName = 'test-output-chart.csv';
+const inputPath = rootPath + inputJsonName;
+const outputPath = rootPath + outputJsonName;
+const exportPath = rootPath + outputCsvName;
+const chartPath = rootPath + outputCsvChartName;
+
+const impData = readData(inputPath);
 // console.log(impData[0]);
 // [{"time":1357542000,"close":13.59,"high":13.59,"low":13.59,"open":13.59,"volumefrom":0,"volumeto":0},
 
-const r1: DataObject[] = FormatTradeDataService.makeOneEmptyAllEmpty(impData);
-const r2: DataObject[] = FormatTradeDataService.makeItemUnique(r1, 'time');
-const outData: DataObject[] = FormatTradeDataService.makeEmptyItemDelete(r2);
-
-const usableNumber = outData.length;
+const formatData = getFormatData(impData);
+const startTimestamp = FormatTradeDataService.getAttrMin(impData, 'time').time;
+const endTimestamp = FormatTradeDataService.getAttrMax(impData, 'time').time;
+const totalNumber = impData.length;
+const usableNumber = formatData.length;
 const nanNumber = totalNumber - usableNumber;
 console.log(startTimestamp, endTimestamp, totalNumber, usableNumber, nanNumber);
 // 1357542000 1551942000 54001 50670 3331
@@ -26,32 +70,26 @@ console.log(startTimestamp, endTimestamp, totalNumber, usableNumber, nanNumber);
 // console.log(outData[0], outData[1], outData[outData.length-1]);
 // ...
 
-const pieceData: DataObject[][] = FormatTradeDataService.makeIdxconsequentList(outData, 'time', 3600);
-const maxLengthPieceData: DataObject[] = FormatTradeDataService.getMaxLengthList(pieceData);
-
-const pieceLength = pieceData.length;
-const startTimestampMax = FormatTradeDataService.getAttrMin(maxLengthPieceData, 'time').time;
-const endTimestampMax = FormatTradeDataService.getAttrMax(maxLengthPieceData, 'time').time;
-const maxLengthPieceNumber = maxLengthPieceData.length;
+const usefulData = getUsefulData(formatData);
+const startTimestampMax = FormatTradeDataService.getAttrMin(usefulData, 'time').time;
+const endTimestampMax = FormatTradeDataService.getAttrMax(usefulData, 'time').time;
+const maxLengthPieceNumber = usefulData.length;
 const maxLengthPiecePercent = maxLengthPieceNumber / totalNumber * 100;
-console.log(startTimestampMax, endTimestampMax, maxLengthPieceNumber, maxLengthPiecePercent, pieceLength);
+console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLengthPieceNumber);
 // 1391338800 1551942000 44613 82.61513675672673
 // 2014/2/2 21:00:00 GMT+0900 ~ 2019/3/7 16:00:00 GMT+0900
 // console.log(maxLengthPieceData[0], maxLengthPieceData[1], maxLengthPieceData[maxLengthPieceData.length-1]);
 // ...
 
-import fs from 'fs';
-const outputPath = "src/_test_data_source/test-output.json"
-const outputData = {
-    data: maxLengthPieceData,
-}
-// fs.writeFileSync(outputPath, JSON.stringify(outputData));
+saveDataToJSON(outputPath, usefulData);
+saveDataToCsv(exportPath, usefulData.slice(0, 10));
+saveDataToCsvChart(chartPath, usefulData);
+
 
 
 /**
- * TODO
- * For list pass all using certain range length and step
- * NaN piece num
- * NaN piece max length
- * NaN pieve average length
+ * TODO:
+ * Promise the import / export
+ * Service add TF needed data process
+ * Other statistic summary: NaN piece num, NaN piece max length, NaN pieve average length
  */
