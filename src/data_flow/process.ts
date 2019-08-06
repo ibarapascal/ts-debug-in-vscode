@@ -1,9 +1,12 @@
 import FormatTradeDataService from '../data_flow/format-trade-data-service';
 import DataObject from '../data_flow/data-object';
 
-import data from '../_test_data_source/db-btc-hours-20130401-20190715.json';
-let impData: DataObject[] = data.data; // Good to run, error when slow
-// Seems max length: 540001 JSON data.
+import data from '../_test_data_source/db-btc-hours-20130401-20190307.json';
+// import data from '../_test_data_source/db-btc-hours-20140202-20190307.json';
+let impData: DataObject[] = data.data; // Good to run
+// let impData: DataObject[] = data.data.slice(-50000); => also same range of data
+// start from middle => last the same
+// Seems max length get from before: 54001 records.
 
 const startTimestamp = FormatTradeDataService.getAttrMin(impData, 'time').time;
 const endTimestamp = FormatTradeDataService.getAttrMax(impData, 'time').time;

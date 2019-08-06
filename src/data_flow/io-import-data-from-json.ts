@@ -10,16 +10,23 @@ tsconfig.json
         "esModuleInterop": true
 */
 
-import data from '../_test_data_source/import-data-from-json-test.json';
+// import data from '../_test_data_source/import-data-from-json-test.json';
+// interface testDataObject {
+//     id: number;
+//     value: number;
+//     name: string;
+// }
+// let importData: testDataObject[] = data.data;
+// for (let item of importData) {
+//     console.log(item);
+// }
 
-interface testDataObject {
-    id: number;
-    value: number;
-    name: string;
-}
+import DataObject from './data-object';
+import fs from 'fs';
 
-let importData: testDataObject[] = data.data;
+let outputPath = "src/_test_data_source/test-output.json"
 
-for (let item of importData) {
-    console.log(item);
-}
+let impData: DataObject[] = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+
+console.log(impData.length);
+console.log(impData[0]);
