@@ -11,8 +11,8 @@ package.json
 // declare function require(name:string):any;
 let csvToJson = require('convert-csv-to-json');
 
-let fileInputName = 'src/_test_data_source/convert-csv-to-json-test.csv'; 
-let fileOutputName = 'src/_test_data_source/test-output.json';
+let fileInputName = 'src/_test_data_source/test-output.csv'; 
+let fileOutputName = 'src/_test_data_source/test-output-trans-by-csv.json';
 
 let json = csvToJson.formatValueByType().getJsonFromCsv(fileInputName);
 

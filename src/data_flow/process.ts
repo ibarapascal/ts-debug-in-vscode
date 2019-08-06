@@ -37,15 +37,13 @@ function saveDataToCsvChart(path: string, saveData: DataObject[]) {
     const header = Object.keys(saveData[0]);
     let csv = saveData.map(row => header.filter(item => item === 'close').map(fieldName => JSON.stringify(row[fieldName])).join(','));
     csv.unshift(header.filter(item => item === 'close').join(','));
-    console.log(csv[0]);
-    console.log(csv[1]);
-    console.log(csv[2]);
     const resultData = csv.join('\r\n');
     fs.writeFileSync(path, resultData);
 }
 
 const rootPath = 'src/_test_data_source/'; // './src/_test_data_source/' the same
-const inputJsonName = 'db-btc-hours-20130401-20190307.json';
+// const inputJsonName = 'db-btc-hours-20130401-20190307.json';
+const inputJsonName = 'BTCUSD-histohour-20140202-20190805.json';
 const outputJsonName = 'test-output.json';
 const outputCsvName = 'test-output.csv';
 const outputCsvChartName = 'test-output-chart.csv';
@@ -67,6 +65,9 @@ const nanNumber = totalNumber - usableNumber;
 console.log(startTimestamp, endTimestamp, totalNumber, usableNumber, nanNumber);
 // 1357542000 1551942000 54001 50670 3331
 // 2013/1/7 16:00:00 GMT+0900 ~ 2019/3/7 16:00:00 GMT+0900
+// 0 1556866800 48001 47995 6
+// 5/3/2019, 4:00:00 PM Standard Time
+// 
 // console.log(outData[0], outData[1], outData[outData.length-1]);
 // ...
 
@@ -78,6 +79,7 @@ const maxLengthPiecePercent = maxLengthPieceNumber / totalNumber * 100;
 console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLengthPieceNumber);
 // 1391338800 1551942000 44613 82.61513675672673
 // 2014/2/2 21:00:00 GMT+0900 ~ 2019/3/7 16:00:00 GMT+0900
+// 1391338800 1556866800 95.79175433845128 45981
 // console.log(maxLengthPieceData[0], maxLengthPieceData[1], maxLengthPieceData[maxLengthPieceData.length-1]);
 // ...
 

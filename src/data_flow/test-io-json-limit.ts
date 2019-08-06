@@ -27,7 +27,7 @@ import fs from 'fs';
 
 // -----------------------------------------------------------------------------------
 // Write JSON
-// import data from '../_test_data_source/db-btc-hours-20130401-20190307.json';
+// import data from '../_test_data_source/BTCUSD-histohour-20140202-20190805.json';
 // let impData: DataObject[] = data.data; // Good to run
 // console.log(impData.length);
 // let outputPath = "src/_test_data_source/test-output.json"
