@@ -1,45 +1,46 @@
+import CommonService from '../data_flow/common-service';
 import FormatTradeDataService from '../data_flow/format-trade-data-service';
-import DataObject from '../data_flow/data-object';
-import fs from 'fs';
+import SelectTradeDataService from '../data_flow/select-trade-date-service';
+import IoTradeDataService from './io-trade-data-service';
 
-function readData(path: string): DataObject[] {
-    const impData: DataObject[] = JSON.parse(fs.readFileSync(path, 'utf8')).data;
+import DataObject from '../data_flow/data-object';
+
+
+function readData(): DataObject[] {
+    const impData: DataObject[] = IoTradeDataService.getImportData(inputPath);
     return impData;
 }
 
 function getFormatData(impData: DataObject[]): DataObject[] {
     const r1: DataObject[] = FormatTradeDataService.makeOneEmptyAllEmpty(impData);
     const r2: DataObject[] = FormatTradeDataService.makeItemUnique(r1, 'time');
-    const outData: DataObject[] = FormatTradeDataService.makeEmptyItemDelete(r2);
-    return outData;
+    const formatData: DataObject[] = FormatTradeDataService.makeEmptyItemDelete(r2);
+    return formatData;
 }
 
-function getUsefulData(outData: DataObject[]): DataObject[] {
-    const pieceData: DataObject[][] = FormatTradeDataService.makeIdxconsequentList(outData, 'time', 3600);
-    const usefulData: DataObject[] = FormatTradeDataService.getMaxLengthList(pieceData);
+function getUsefulData(formatData: DataObject[]): DataObject[] {
+    const r1: DataObject[][] = FormatTradeDataService.makeIdxconsequentList(formatData, 'time', 3600);
+    const usefulData: DataObject[] = FormatTradeDataService.getMaxLengthList(r1);
     return usefulData;
 }
 
-function saveDataToJSON(path: string, saveData: DataObject[]) {
-    const outputData = {data: saveData, }    
-    fs.writeFileSync(path, JSON.stringify(outputData));
+function getTranData(usefulData: DataObject[]): DataObject[][] {
+    const tranList: number[] = SelectTradeDataService.getTimestampWhenPriceChange(usefulData, 0.05, 0.01, true);
+    const tranData: DataObject[][] = SelectTradeDataService.getObjListBeforeIdx(usefulData, 'time', tranList, 100);
+    return tranData;
 }
 
-function saveDataToCsv(path: string, saveData: DataObject[]) {
-    const header = Object.keys(saveData[0]);
-    let csv = saveData.map(row => header.map(fieldName => JSON.stringify(row[fieldName])).join(','));
-    csv.unshift(header.join(','));
-    const resultData = csv.join('\r\n');
-    fs.writeFileSync(path, resultData);
+function saveUsefulData() {
+    IoTradeDataService.saveDataToJSON(outputPath, usefulData);
+    IoTradeDataService.saveDataToCsv(exportPath, usefulData.slice(0, 10));
+    IoTradeDataService.saveDataToCsvChart(chartPath, usefulData);
 }
 
-function saveDataToCsvChart(path: string, saveData: DataObject[]) {
-    const header = Object.keys(saveData[0]);
-    let csv = saveData.map(row => header.filter(item => item === 'close').map(fieldName => JSON.stringify(row[fieldName])).join(','));
-    csv.unshift(header.filter(item => item === 'close').join(','));
-    const resultData = csv.join('\r\n');
-    fs.writeFileSync(path, resultData);
+function saveTranData() {
+    IoTradeDataService.saveDataToJSON(outputPath, usefulData);
+    // IoTradeDataService.saveDataToJSONMultiple()
 }
+
 
 const rootPath = 'src/_test_data_source/'; // './src/_test_data_source/' the same
 // const inputJsonName = 'db-btc-hours-20130401-20190307.json';
@@ -51,14 +52,19 @@ const inputPath = rootPath + inputJsonName;
 const outputPath = rootPath + outputJsonName;
 const exportPath = rootPath + outputCsvName;
 const chartPath = rootPath + outputCsvChartName;
+// const subRootTranPath = 'trans/';
+// const outputTranPath = rootPath + subRootTranPath + outputJsonName;
+// const exportTranPath = rootPath+ subRootTranPath + outputCsvName;
+// const chartTranPath = rootPath+ subRootTranPath + outputCsvChartName;
 
-const impData = readData(inputPath);
+
+const impData = readData();
 // console.log(impData[0]);
 // [{"time":1357542000,"close":13.59,"high":13.59,"low":13.59,"open":13.59,"volumefrom":0,"volumeto":0},
 
 const formatData = getFormatData(impData);
-const startTimestamp = FormatTradeDataService.getAttrMin(impData, 'time').time;
-const endTimestamp = FormatTradeDataService.getAttrMax(impData, 'time').time;
+const startTimestamp = CommonService.getAttrMin(impData, 'time').time;
+const endTimestamp = CommonService.getAttrMax(impData, 'time').time;
 const totalNumber = impData.length;
 const usableNumber = formatData.length;
 const nanNumber = totalNumber - usableNumber;
@@ -72,8 +78,8 @@ console.log(startTimestamp, endTimestamp, totalNumber, usableNumber, nanNumber);
 // ...
 
 const usefulData = getUsefulData(formatData);
-const startTimestampMax = FormatTradeDataService.getAttrMin(usefulData, 'time').time;
-const endTimestampMax = FormatTradeDataService.getAttrMax(usefulData, 'time').time;
+const startTimestampMax = CommonService.getAttrMin(usefulData, 'time').time;
+const endTimestampMax = CommonService.getAttrMax(usefulData, 'time').time;
 const maxLengthPieceNumber = usefulData.length;
 const maxLengthPiecePercent = maxLengthPieceNumber / totalNumber * 100;
 console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLengthPieceNumber);
@@ -83,15 +89,16 @@ console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLength
 // console.log(maxLengthPieceData[0], maxLengthPieceData[1], maxLengthPieceData[maxLengthPieceData.length-1]);
 // ...
 
-saveDataToJSON(outputPath, usefulData);
-saveDataToCsv(exportPath, usefulData.slice(0, 10));
-saveDataToCsvChart(chartPath, usefulData);
+
+// saveUsefulData();
+
+
+const tranData = getTranData(usefulData);
+const tranDataLength = tranData.length;
+console.log(tranDataLength);
 
 
 
-/**
- * TODO:
- * Promise the import / export
- * Service add TF needed data process
- * Other statistic summary: NaN piece num, NaN piece max length, NaN pieve average length
- */
+
+
+
