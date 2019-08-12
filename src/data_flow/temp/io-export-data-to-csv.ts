@@ -1,4 +1,4 @@
-import DataObject from './data-object';
+import DataObject from '../data-object';
 import fs from 'fs';
 
 let inputPath = "src/_test_data_source/test-output.json"

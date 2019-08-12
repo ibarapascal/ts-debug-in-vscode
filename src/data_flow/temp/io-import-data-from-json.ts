@@ -21,7 +21,7 @@ tsconfig.json
 //     console.log(item);
 // }
 
-import DataObject from './data-object';
+import DataObject from '../data-object';
 import fs from 'fs';
 
 let outputPath = "src/_test_data_source/test-output.json"

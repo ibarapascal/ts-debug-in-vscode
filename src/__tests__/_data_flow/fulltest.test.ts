@@ -1,5 +1,9 @@
 import { expect } from 'chai';
+
+import CommonService from '../../data_flow/common-service';
 import FormatTradeDataService from '../../data_flow/format-trade-data-service';
+import SelectTradeDataService from '../../data_flow/select-trade-date-service';
+import IoTradeDataService from '../../data_flow/io-trade-data-service';
 
 describe('FormatTradeDataFormatTradeDataService', () => {
 
@@ -20,30 +24,30 @@ describe('FormatTradeDataFormatTradeDataService', () => {
     }]
 
     it('getAttrMin-1', () => {
-        expect(FormatTradeDataService.getAttrMin(t1, 'id')).to.equal(t1[0]);
+        expect(CommonService.getAttrMin(t1, 'id')).to.equal(t1[0]);
     })
     it('getAttrMin-2', () => {
-        expect(FormatTradeDataService.getAttrMin(t1, 'value')).to.equal(t1[2]);
+        expect(CommonService.getAttrMin(t1, 'value')).to.equal(t1[2]);
     })
 
     it('getAttrMax-1', () => {
-        expect(FormatTradeDataService.getAttrMax(t1, 'id')).to.equal(t1[2]);
+        expect(CommonService.getAttrMax(t1, 'id')).to.equal(t1[2]);
     })
     it('getAttrMax-2', () => {
-        expect(FormatTradeDataService.getAttrMax(t1, 'value')).to.equal(t1[0]);
+        expect(CommonService.getAttrMax(t1, 'value')).to.equal(t1[0]);
     })
 
     it('makeIdxSort-1', () => {
-        expect(JSON.stringify(FormatTradeDataService.makeIdxSort(t1.slice(0), 'value'))).to.equal(JSON.stringify(t1.slice(0).reverse()));
+        expect(JSON.stringify(CommonService.makeIdxSort(t1.slice(0), 'value'))).to.equal(JSON.stringify(t1.slice(0).reverse()));
     })
     it('makeIdxSort-2', () => {
-        expect(JSON.stringify(FormatTradeDataService.makeIdxSort(t1.slice(0), 'id'))).to.equal(JSON.stringify(t1));
+        expect(JSON.stringify(CommonService.makeIdxSort(t1.slice(0), 'id'))).to.equal(JSON.stringify(t1));
     })
     it('makeIdxSort-3', () => {
-        expect(JSON.stringify(FormatTradeDataService.makeIdxSort(t1.slice(0), 'number'))).to.equal(JSON.stringify([t1[2],t1[0],t1[1]]));
+        expect(JSON.stringify(CommonService.makeIdxSort(t1.slice(0), 'number'))).to.equal(JSON.stringify([t1[2],t1[0],t1[1]]));
     })
     it('makeIdxSort-4', () => {
-        expect(JSON.stringify(FormatTradeDataService.makeIdxSort(t1.slice(0)))).to.equal(JSON.stringify(t1.slice(0)));
+        expect(JSON.stringify(CommonService.makeIdxSort(t1.slice(0)))).to.equal(JSON.stringify(t1.slice(0)));
     })
 
     const t2 = [{
@@ -246,16 +250,16 @@ describe('FormatTradeDataFormatTradeDataService', () => {
         number: 222,
     }]
     it('getObjBeforeIdx-1', () => {
-        expect(JSON.stringify(FormatTradeDataService.getObjBeforeIdx(t6.slice(0), 'id', 4, 10))).to.equal(JSON.stringify(t6R1.slice(0)));
+        expect(JSON.stringify(SelectTradeDataService.getObjBeforeIdx(t6.slice(0), 'id', 4, 10))).to.equal(JSON.stringify(t6R1.slice(0)));
     })
     it('getObjBeforeIdx-2', () => {
-        expect(JSON.stringify(FormatTradeDataService.getObjBeforeIdx(t6.slice(0), 'id', 4))).to.equal(JSON.stringify([t6R1.slice(0)[2]]));
+        expect(JSON.stringify(SelectTradeDataService.getObjBeforeIdx(t6.slice(0), 'id', 4))).to.equal(JSON.stringify([t6R1.slice(0)[2]]));
     })
     it('getObjAfterIdx-1', () => {
-        expect(JSON.stringify(FormatTradeDataService.getObjAfterIdx(t6.slice(0), 'id', 4, 10))).to.equal(JSON.stringify(t6R2.slice(0)));
+        expect(JSON.stringify(SelectTradeDataService.getObjAfterIdx(t6.slice(0), 'id', 4, 10))).to.equal(JSON.stringify(t6R2.slice(0)));
     })
     it('getObjAfterIdx-2', () => {
-        expect(JSON.stringify(FormatTradeDataService.getObjAfterIdx(t6.slice(0), 'id', 4))).to.equal(JSON.stringify([t6R2.slice(0)[0]]));
+        expect(JSON.stringify(SelectTradeDataService.getObjAfterIdx(t6.slice(0), 'id', 4))).to.equal(JSON.stringify([t6R2.slice(0)[0]]));
     })
 
     const t7 = [{

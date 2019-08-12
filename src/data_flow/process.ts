@@ -7,7 +7,7 @@ import DataObject from '../data_flow/data-object';
 
 
 function readData(): DataObject[] {
-    const impData: DataObject[] = IoTradeDataService.getImportData(inputPath);
+    const impData: DataObject[] = IoTradeDataService.getFromJSON(inputPath);
     return impData;
 }
 
@@ -25,44 +25,44 @@ function getUsefulData(formatData: DataObject[]): DataObject[] {
 }
 
 function getTranData(usefulData: DataObject[]): DataObject[][] {
-    const tranList: number[] = SelectTradeDataService.getTimestampWhenPriceChange(usefulData, 0.05, 0.01, true);
+    const tranList: number[] = SelectTradeDataService.getTimestampWhenPriceChange(usefulData, 0.10, 0.01, true);
     const tranData: DataObject[][] = SelectTradeDataService.getObjListBeforeIdx(usefulData, 'time', tranList, 100);
     return tranData;
 }
 
 function saveUsefulData() {
-    IoTradeDataService.saveDataToJSON(outputPath, usefulData);
-    IoTradeDataService.saveDataToCsv(exportPath, usefulData.slice(0, 10));
-    IoTradeDataService.saveDataToCsvChart(chartPath, usefulData);
+    IoTradeDataService.saveToJSON(outputPath, usefulData);
+    IoTradeDataService.saveToCsv(exportPath, usefulData.slice(0, 10));
+    IoTradeDataService.saveToCsvChart(chartPath, usefulData);
 }
 
 function saveTranData() {
-    IoTradeDataService.saveDataToJSON(outputPath, usefulData);
-    // IoTradeDataService.saveDataToJSONMultiple()
+    IoTradeDataService.saveToJSON(outputPath, tranData);
+    IoTradeDataService.saveToJSONMultiple(outputTranPath, tranData);
+    IoTradeDataService.saveToCSVMultiple(exportTranPath, tranData);
 }
 
 
 const rootPath = 'src/_test_data_source/'; // './src/_test_data_source/' the same
-// const inputJsonName = 'db-btc-hours-20130401-20190307.json';
-const inputJsonName = 'BTCUSD-histohour-20140202-20190805.json';
-const outputJsonName = 'test-output.json';
-const outputCsvName = 'test-output.csv';
-const outputCsvChartName = 'test-output-chart.csv';
+// const inputJsonName = 'db-btc-hours-20130401-20190307';
+const inputJsonName = 'BTCUSD-histohour-20140202-20190805';
+const outputJsonName = 'test-output';
+const outputCsvName = 'test-output';
+const outputCsvChartName = 'test-output-chart';
 const inputPath = rootPath + inputJsonName;
 const outputPath = rootPath + outputJsonName;
 const exportPath = rootPath + outputCsvName;
 const chartPath = rootPath + outputCsvChartName;
-// const subRootTranPath = 'trans/';
-// const outputTranPath = rootPath + subRootTranPath + outputJsonName;
-// const exportTranPath = rootPath+ subRootTranPath + outputCsvName;
-// const chartTranPath = rootPath+ subRootTranPath + outputCsvChartName;
+const subRootTranJSONPath = 'transJSON/';
+const subRootTranCSVPath = 'transCSV/';
+const outputTranPath = rootPath + subRootTranJSONPath;
+const exportTranPath = rootPath+ subRootTranCSVPath;
 
-
-const impData = readData();
+const impData = readData(); // ! Import
 // console.log(impData[0]);
 // [{"time":1357542000,"close":13.59,"high":13.59,"low":13.59,"open":13.59,"volumefrom":0,"volumeto":0},
 
-const formatData = getFormatData(impData);
+const formatData = getFormatData(impData); // ! STEP:1
 const startTimestamp = CommonService.getAttrMin(impData, 'time').time;
 const endTimestamp = CommonService.getAttrMax(impData, 'time').time;
 const totalNumber = impData.length;
@@ -77,7 +77,7 @@ console.log(startTimestamp, endTimestamp, totalNumber, usableNumber, nanNumber);
 // console.log(outData[0], outData[1], outData[outData.length-1]);
 // ...
 
-const usefulData = getUsefulData(formatData);
+const usefulData = getUsefulData(formatData); // ! STEP:2
 const startTimestampMax = CommonService.getAttrMin(usefulData, 'time').time;
 const endTimestampMax = CommonService.getAttrMax(usefulData, 'time').time;
 const maxLengthPieceNumber = usefulData.length;
@@ -90,12 +90,14 @@ console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLength
 // ...
 
 
-// saveUsefulData();
+// saveUsefulData(); // ! Export:1
 
 
-const tranData = getTranData(usefulData);
+const tranData = getTranData(usefulData); // ! STEP:3
 const tranDataLength = tranData.length;
 console.log(tranDataLength);
+
+saveTranData(); // ! Export:2
 
 
 

@@ -4,44 +4,74 @@ import fs from 'fs';
 export default class IoTradeDataService {
 
     /**
-     * 
-     * @param path 
+     * Single JSON file data import while attr start with 'data'
+     * @param path import path without extended name
      */
-    static getImportData(path: string): DataObject[] {
-        return JSON.parse(fs.readFileSync(path, 'utf8')).data;
+    static getFromJSON(path: string): DataObject[] {
+        return JSON.parse(fs.readFileSync(path + '.json', 'utf8')).data;
     }
     /**
-     * 
-     * @param path 
-     * @param saveData 
+     * Single JSON file data export
+     * @param path export path without extended name
+     * @param saveData data export
      */
-    static saveDataToJSON(path: string, saveData: DataObject[] | DataObject[][]) {
+    static saveToJSON(path: string, saveData: DataObject[] | DataObject[][]) {
         const outputData = {data: saveData, }    
-        fs.writeFileSync(path, JSON.stringify(outputData));
+        fs.writeFileSync(path + '.json', JSON.stringify(outputData));
     }
     /**
-     * 
-     * @param path 
-     * @param saveData 
+     * Single CSV file data export with all attr setted
+     * @param path export path without extended name 
+     * @param saveData data export
      */
-    static saveDataToCsv(path: string, saveData: DataObject[]) {
+    static saveToCsv(path: string, saveData: DataObject[]) {
         const header = Object.keys(saveData[0]);
         let csv = saveData.map(row => header.map(fieldName => JSON.stringify(row[fieldName])).join(','));
         csv.unshift(header.join(','));
         const resultData = csv.join('\r\n');
-        fs.writeFileSync(path, resultData);
+        fs.writeFileSync(path + '.csv', resultData);
     }
     /**
-     * 
-     * @param path 
-     * @param saveData 
+     * Single CSV file data export with only attr 'close' setted for some simple chart usage
+     * @param path export path without extended name 
+     * @param saveData data export
      */
-    static saveDataToCsvChart(path: string, saveData: DataObject[]) {
+    static saveToCsvChart(path: string, saveData: DataObject[]) {
         const header = Object.keys(saveData[0]);
         let csv = saveData.map(row => header.filter(item => item === 'close').map(fieldName => JSON.stringify(row[fieldName])).join(','));
         csv.unshift(header.filter(item => item === 'close').join(','));
         const resultData = csv.join('\r\n');
-        fs.writeFileSync(path, resultData);
+        fs.writeFileSync(path + '.csv', resultData);
+    }
+    /**
+     * Multiple JSON file data export
+     * @param pathRoot export folder path // ! notice that the folder must exist before running this
+     * @param saveData data export
+     */
+    static saveToJSONMultiple(pathRoot: string, saveData: DataObject[][]) {
+        const fileName = 'tran-';
+        // Length of decimal length of data
+        const dataLength: number = saveData.length.toString().length;
+        saveData.forEach((item, index) => {
+            // Output integers with leading zeros
+            let fileIndex: string = index.toString().padStart(dataLength, '0');
+            this.saveToJSON(pathRoot + fileName + fileIndex, item);
+        })
+    }
+    /**
+     * Multiple CSV file data export
+     * @param pathRoot export folder path // ! notice that the folder must exist before running this
+     * @param saveData data export'
+     */
+    static saveToCSVMultiple(pathRoot: string, saveData: DataObject[][]) {
+        const fileName = 'tran-';
+        // Length of decimal length of data
+        const dataLength: number = saveData.length.toString().length;
+        saveData.forEach((item, index) => {
+            // Output integers with leading zeros
+            let fileIndex: string = index.toString().padStart(dataLength, '0');
+            this.saveToCsv(pathRoot + fileName + fileIndex, item);
+        })
     }
 }
 
