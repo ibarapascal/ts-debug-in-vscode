@@ -95,7 +95,7 @@ console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLength
 // ...
 
 
-saveUsefulData(); // ! Export:1
+// saveUsefulData(); // ! Export:1
 
 
 const tranData = getTranData(usefulData); // ! STEP:3
@@ -103,7 +103,7 @@ const tranDataLength = tranData.length;
 console.log(tranDataLength);
 
 deleteTranData();
-// saveTranData(); // ! Export:2
+saveTranData(); // ! Export:2
 
 
 /**
