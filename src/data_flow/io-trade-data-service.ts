@@ -76,6 +76,17 @@ export default class IoTradeDataService {
             this.saveToCsv(pathRoot + fileName + fileIndex, item);
         })
     }
+    /**
+     * Delete all files in specific folder
+     * @param path delete folder path
+     */
+    static deleteFolderFiles(path: string) {
+        fs.readdir(path, (err, files) =>{
+            files.forEach(file => {
+                fs.unlink(path + file, err => {});
+            });
+        });
+    }
 }
 
 

@@ -37,9 +37,14 @@ function saveUsefulData() {
 }
 
 function saveTranData() {
-    IoTradeDataService.saveToJSON(outputPath, tranData);
+    // IoTradeDataService.saveToJSON(outputPath, tranData);
     IoTradeDataService.saveToJSONMultiple(outputTranPath, tranData);
     IoTradeDataService.saveToCSVMultiple(exportTranPath, tranData);
+}
+
+function deleteTranData() {
+    IoTradeDataService.deleteFolderFiles(outputTranPath);
+    IoTradeDataService.deleteFolderFiles(exportTranPath);
 }
 
 
@@ -90,14 +95,15 @@ console.log(startTimestampMax, endTimestampMax, maxLengthPiecePercent, maxLength
 // ...
 
 
-// saveUsefulData(); // ! Export:1
+saveUsefulData(); // ! Export:1
 
 
 const tranData = getTranData(usefulData); // ! STEP:3
 const tranDataLength = tranData.length;
 console.log(tranDataLength);
 
-saveTranData(); // ! Export:2
+deleteTranData();
+// saveTranData(); // ! Export:2
 
 
 /**
