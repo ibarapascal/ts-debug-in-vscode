@@ -8,9 +8,11 @@ export default class SelectTradeDataService {
      * @param attr sort index
      * @param value value of index
      * @param length output length
+     * @param strict if true, return [] when the result length doesn't fit length setted
      */
-    static getObjBeforeIdx(data: DataObject[], attr: string, value: number, length: number = 1) : DataObject[]{
-        return CommonService.makeIdxSort(data, attr).filter(item => item[attr] < value).slice( - length);
+    static getObjBeforeIdx(data: DataObject[], attr: string, value: number, length: number = 1, strict: boolean = false) : DataObject[]{
+        const resultList = CommonService.makeIdxSort(data, attr).filter(item => item[attr] < value).slice( - length);
+        return strict && resultList.length !== length ? null : resultList;
     }
     /**
      * Get the objects which index value is larger than setted value within certain steps
@@ -18,9 +20,11 @@ export default class SelectTradeDataService {
      * @param attr sort index
      * @param value value of index
      * @param length output length
+     * @param strict if true, return [] when the result length doesn't fit length setted
      */
-    static getObjAfterIdx(data: DataObject[], attr: string, value: number, length: number = 1) : DataObject[]{
-        return CommonService.makeIdxSort(data, attr).filter(item => item[attr] > value).slice(0, length);
+    static getObjAfterIdx(data: DataObject[], attr: string, value: number, length: number = 1, strict: boolean = false) : DataObject[]{
+        const resultList = CommonService.makeIdxSort(data, attr).filter(item => item[attr] > value).slice(0, length);
+        return strict && resultList.length !== length ? null : resultList;
     }
     /**
      * Get the list of objects which index value is smaller than setted value within certain steps
@@ -28,11 +32,13 @@ export default class SelectTradeDataService {
      * @param attr sort index
      * @param valueList value list of index
      * @param length output length for each item
+     * @param strict if true, item return [] when the result length doesn't fit length setted
      */
-    static getObjListBeforeIdx(data: DataObject[], attr: string, valueList: number[], length: number = 1) : DataObject[][]{
+    static getObjListBeforeIdx(data: DataObject[], attr: string, valueList: number[], length: number = 1, strict: boolean = false) : DataObject[][]{
         let resultObjList : Array<DataObject[]> = [];
         valueList.forEach(item => {
-            resultObjList.push(this.getObjBeforeIdx(data, attr, item, length));
+            const pushItem = this.getObjBeforeIdx(data, attr, item, length, strict);
+            pushItem ? resultObjList.push(pushItem) : null;
         })
         return resultObjList;
     }
@@ -42,11 +48,13 @@ export default class SelectTradeDataService {
      * @param attr sort index
      * @param valueList value list of index
      * @param length output length for each item
+     * @param strict if true, item return [] when the result length doesn't fit length setted
      */
-    static getObjListAfterIdx(data: DataObject[], attr: string, valueList: number[], length: number = 1) : DataObject[][]{
+    static getObjListAfterIdx(data: DataObject[], attr: string, valueList: number[], length: number = 1, strict: boolean = false) : DataObject[][]{
         let resultObjList : Array<DataObject[]> = [];
         valueList.forEach(item => {
-            resultObjList.push(this.getObjAfterIdx(data, attr, item, length));
+            const pushItem = this.getObjAfterIdx(data, attr, item, length, strict);
+            pushItem ? resultObjList.push(pushItem) : null;
         })
         return resultObjList;
     }

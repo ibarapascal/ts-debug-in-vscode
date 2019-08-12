@@ -26,7 +26,7 @@ function getUsefulData(formatData: DataObject[]): DataObject[] {
 
 function getTranData(usefulData: DataObject[]): DataObject[][] {
     const tranList: number[] = SelectTradeDataService.getTimestampWhenPriceChange(usefulData, 0.10, 0.01, true);
-    const tranData: DataObject[][] = SelectTradeDataService.getObjListBeforeIdx(usefulData, 'time', tranList, 100);
+    const tranData: DataObject[][] = SelectTradeDataService.getObjListBeforeIdx(usefulData, 'time', tranList, 100, true);
     return tranData;
 }
 
@@ -99,6 +99,11 @@ console.log(tranDataLength);
 
 saveTranData(); // ! Export:2
 
+
+/**
+ * TODO
+ * Handle the promise and error throw during IO and null situation
+ */
 
 
 

@@ -1,5 +1,6 @@
 import DataObject from './data-object';
 import fs from 'fs';
+import CommonService from '../data_flow/common-service';
 
 export default class IoTradeDataService {
 
@@ -25,6 +26,7 @@ export default class IoTradeDataService {
      * @param saveData data export
      */
     static saveToCsv(path: string, saveData: DataObject[]) {
+        if (CommonService.checkIfNumberEmpty(saveData.length)) return; // temp handling [] situation
         const header = Object.keys(saveData[0]);
         let csv = saveData.map(row => header.map(fieldName => JSON.stringify(row[fieldName])).join(','));
         csv.unshift(header.join(','));
@@ -37,6 +39,7 @@ export default class IoTradeDataService {
      * @param saveData data export
      */
     static saveToCsvChart(path: string, saveData: DataObject[]) {
+        if (CommonService.checkIfNumberEmpty(saveData.length)) return; // temp handling [] situation
         const header = Object.keys(saveData[0]);
         let csv = saveData.map(row => header.filter(item => item === 'close').map(fieldName => JSON.stringify(row[fieldName])).join(','));
         csv.unshift(header.filter(item => item === 'close').join(','));
@@ -54,7 +57,7 @@ export default class IoTradeDataService {
         const dataLength: number = saveData.length.toString().length;
         saveData.forEach((item, index) => {
             // Output integers with leading zeros
-            let fileIndex: string = index.toString().padStart(dataLength, '0');
+            let fileIndex: string = (index + 1).toString().padStart(dataLength, '0');
             this.saveToJSON(pathRoot + fileName + fileIndex, item);
         })
     }
@@ -69,7 +72,7 @@ export default class IoTradeDataService {
         const dataLength: number = saveData.length.toString().length;
         saveData.forEach((item, index) => {
             // Output integers with leading zeros
-            let fileIndex: string = index.toString().padStart(dataLength, '0');
+            let fileIndex: string = (index + 1).toString().padStart(dataLength, '0');
             this.saveToCsv(pathRoot + fileName + fileIndex, item);
         })
     }
